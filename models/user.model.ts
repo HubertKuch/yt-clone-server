@@ -28,7 +28,7 @@ const userSchema: Schema = new Schema({
             },
             message: "Pass must have min one capital character",
         },
-        select: false,
+        // select: false,
     },
     subscriptions: {
         type: Number,
@@ -39,9 +39,9 @@ const userSchema: Schema = new Schema({
     photo: String,
 });
 
-userSchema.pre("save", function(next){
+userSchema.pre("save", async function(next){
     console.log(`USER PREPARED TO SAVE: ${Date.now()}`);
-    this.password = bcrypt.hash(this.password, 12);
+    this.password = await bcrypt.hash(this.password, 12);
     this.passwordConfirm = undefined;
     next();
 });
@@ -51,7 +51,7 @@ userSchema.post("save", function(doc){
 });
 
 userSchema.methods.verifyPassword = async function(bearerPassword, password){
-    return !!(await bcrypt.compare(bearerPassword, password));
+    return (await bcrypt.compare(bearerPassword, password));
 }
 
 const UserModel = model("User", userSchema);
