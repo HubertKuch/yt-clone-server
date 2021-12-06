@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import Comment from "./comment.model";
+import commentSchema from "./commentSchema";
 
 const filmSchema = new Schema({
     title: {
@@ -12,6 +12,8 @@ const filmSchema = new Schema({
     },
     userId: {
         type: Schema.Types.ObjectId,
+        ref: "User",
+        required: [true, "UserId is required"],
     },
     views: {
         type: Number,
@@ -26,10 +28,10 @@ const filmSchema = new Schema({
         default: 0,
     },
     comments: {
-        type: [Comment]
+        type: [commentSchema]
     },
 });
 
-const Film: object = model("Film", filmSchema);
+const Film = model("Film", filmSchema);
 
 export default Film;

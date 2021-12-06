@@ -5,6 +5,31 @@ import User from "../models/user.model";
 import AppError from "../utils/appError";
 import Payload from "../utils/payload";
 
+const signToken = (payload: Payload, ) => {
+    // @ts-ignore
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
+}
+
+const createUser = catchAsync(async (req: Request, res: Response, next: NextFunction)=>{
+    const { name, email, password, photo } = req.body;
+    console.log(req.body);
+    const user = await User.create({ name, email, password, photo });
+    if(!user){
+        return next(new AppError("Something went wrong with creating your account. Try again.", 400))
+    }
+
+    const payload: Payload = {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+    };
+
+    const token = signToken(payload);
+
+    res.status(200).json({ status: "ok", code: 200, message: "ok", token });
+});
+
+
 const login = catchAsync(async (req: Request, res: Response, next: NextFunction)=>{
     let token: string = "";
     const { email, password } = req.body;
@@ -22,12 +47,7 @@ const login = catchAsync(async (req: Request, res: Response, next: NextFunction)
             email: user.email,
         };
 
-        token = jwt.sign(
-            payload,
-            // @ts-ignore
-            process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRES_IN }
-        );
+        token = signToken(payload);
         return res.status(200).json({ message: "success", token })
     } else {
         return next(new AppError("Incorrect password or email.", 401));
@@ -51,4 +71,4 @@ const verify = catchAsync(async (req: Request, res: Response, next: NextFunction
     }
 });
 
-export { verify, login }
+export { verify, login, createUser }

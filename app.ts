@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 dotenv.config({ path: "./.env" });
 import userRouter from "./routes/user.router";
+import filmsRouter from "./routes/films.router";
 import AppError from "./utils/appError";
 
 const app: Application = express();
@@ -10,6 +11,7 @@ app.use(express.urlencoded({ extended: true, }));
 app.use(express.json());
 
 app.use("/api/users", userRouter);
+app.use("/api/films", filmsRouter);
 
 app.all("*", (req: Request, res: Response, next: NextFunction)=>{
     return next(new AppError(`route ${req.baseUrl} is not defined`, 404))
