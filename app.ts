@@ -1,14 +1,22 @@
 import express, {Application, NextFunction, Request, Response} from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-dotenv.config({ path: "./.env" });
 import userRouter from "./routes/user.router";
 import filmsRouter from "./routes/films.router";
 import AppError from "./utils/appError";
+import cors from "./middleware/cors";
+import logger from "./middleware/logger";
+
+dotenv.config({ path: "./.env" });
+
 
 const app: Application = express();
 app.use(express.urlencoded({ extended: true, }));
 app.use(express.json());
+app.set("trust proxy", 1);
+
+app.use(cors);
+app.use(logger);
 
 app.use("/api/users", userRouter);
 app.use("/api/films", filmsRouter);
