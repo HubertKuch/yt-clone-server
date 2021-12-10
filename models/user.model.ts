@@ -16,7 +16,12 @@ const userSchema: Schema = new Schema({
             },
             message: "Repeat email",
         },
-        unique: [true, "Email must be unique"]
+        unique: [true, "Email must be unique"],
+    },
+    role: {
+        type: String,
+        enum: ["user", "admin"],
+        default: "user",
     },
     password: {
         type: String,
@@ -28,7 +33,7 @@ const userSchema: Schema = new Schema({
             },
             message: "Pass must have min one capital character",
         },
-        // select: false,
+        select: false,
     },
     subscriptions: {
         type: Number,
@@ -50,7 +55,7 @@ userSchema.post("save", function(doc){
     console.log(`USER ${doc.name} SAVED ${Date.now()}`)
 });
 
-userSchema.methods.verifyPassword = async function(bearerPassword, password){
+userSchema.methods.verifyPassword = async function(bearerPassword: string, password: string){
     return (await bcrypt.compare(bearerPassword, password));
 }
 
